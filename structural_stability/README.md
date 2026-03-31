@@ -1,6 +1,6 @@
 # Physics Baseline Export
 
-이 폴더는 `/data/AskFake/Image/physics/baseline` 실험물 중에서 GitHub 업로드용으로 정리한 export 폴더입니다.
+이 폴더는 실험물 중에서 GitHub 업로드용으로 정리한 export 폴더입니다.
 
 ## Challenge Overview
 
