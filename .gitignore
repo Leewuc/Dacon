@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.DS_Store
+*.zip
+docs/
+assets/fonts/*.ttf
+.streamlit/secrets.toml
