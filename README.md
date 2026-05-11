@@ -1,20 +1,71 @@
-# InvestScope — 투자 역량 분석 대시보드
+# Dacon 프로젝트 모음
 
-> DACON Monthly Hackathon | 6-Skills Framework 기반 투자 포트폴리오 분석 대시보드
+이 레포지토리는 **데이콘(Dacon)** 대회별 실험 코드를 폴더 단위로 정리한 저장소입니다.
+현재는 전력 사용량 예측, 수출입 품목 공이동(comovement) 분석, 유전체 언어모델(MLM) 학습, 구조물 안정성 물리 추론, 스마트 물류 배송 지연 예측, **투자 역량 분석 대시보드(InvestScope)** 프로젝트가 포함되어 있습니다.
 
-## 프로젝트 개요
+## 폴더 구성
 
-InvestScope는 투자 포트폴리오를 **6가지 투자 역량(Skills)** 관점에서 정량 분석하는 대시보드입니다.
-23개 분석 탭 | 6개 카테고리 | 5개 Skills.md 규칙 정의서
+| 폴더 | 설명 | 주요 파일 |
+|------|------|-----------|
+| `Power_usage_pred` | 건물별 전력 사용량 예측 대회 실험 코드 | `catboost_train.py`, `lightbgm_train.py`, `Optuna.py` |
+| `comovement` | 시계열 기반 품목 간 선후행 관계(후보 pair) 탐색/학습 파이프라인 | `prepare_data.py`, `make_pairs_corr.py`, `build_pairs_ml.py`, `make_final_pairs.py` |
+| `mai` | 유전체 서열(FASTA) 기반 마스킹 언어모델(MLM) 학습/추론 코드 | `train_nt.py`, `models_nt.py`, `inference.py`, `inference_nt2p5b.py` |
+| `structural_stability` | 구조물 안정성 물리 추론 대회용 비전 baseline 및 앙상블 코드 | `scripts/train_clean_convnext.py`, `scripts/train_geometry_first.py` |
+| `Smart_Warehouse_Shipment_Delay_Prediction` | 스마트 물류창고 배송 지연 예측 대회 코드 | `baseline/pipeline_baseline.py`, `ensemble/lead_norm_ensemble.py` |
+| `investment-dashboard` | **InvestScope** — 6-Skills Framework 기반 투자 포트폴리오 분석 대시보드 | `app.py`, `src/skills_engine.py`, `src/visualizations.py` |
 
-## 실행 방법
+---
+
+## 폴더별 실행 예시
+
+> 아래 커맨드는 **예시**이며, 실제 실행 전 각 스크립트의 데이터 경로/출력 경로를 본인 환경에 맞게 수정해야 합니다.
+
+### 1) 전력 사용량 예측 (`Power_usage_pred`)
 
 ```bash
+python Power_usage_pred/catboost_train.py
+python Power_usage_pred/lightbgm_train.py
+python Power_usage_pred/Optuna.py
+```
+
+### 2) 공이동 후보쌍 생성 (`comovement`)
+
+```bash
+python comovement/prepare_data.py
+python comovement/make_pairs_corr.py
+python comovement/build_pairs_ml.py
+python comovement/make_final_pairs.py \
+  --pairs_corr pairs_corr.csv \
+  --pseudo_stats pair_pseudo_stats.csv \
+  --out_pairs candidate_pairs_final.csv
+```
+
+### 3) 유전체 MLM 학습/추론 (`mai`)
+
+```bash
+python mai/train_nt.py
+python mai/inference.py
+```
+
+### 4) 구조물 안정성 물리 추론 (`structural_stability`)
+
+```bash
+python structural_stability/scripts/train_clean_convnext.py train \
+  --data-root /path/to/data \
+  --out-dir runs/clean_convnext_base
+```
+
+세부 실험 설정은 `structural_stability/README.md`를 참고하세요.
+
+### 5) InvestScope 투자 대시보드 (`investment-dashboard`)
+
+```bash
+cd investment-dashboard
 pip install -r requirements.txt
 streamlit run app.py
 ```
 
-## 6-Skills Framework
+#### 6-Skills Framework
 
 | Skill | 측정 대상 | 핵심 지표 |
 |-------|---------|---------|
@@ -25,42 +76,21 @@ streamlit run app.py
 | Adaptability | 시장 변화 적응력 | 하락장 상대 성과 |
 | Consistency | 수익 일관성 | 승률, CV, streak |
 
-## 기술 스택
+기술 스택: Streamlit, Plotly, yfinance, pandas, numpy, scipy, reportlab
 
-- **프레임워크**: Streamlit (Python)
-- **시각화**: Plotly (인터랙티브 차트)
-- **데이터**: yfinance (무료, API 키 불필요)
-- **분석**: pandas, numpy, scipy
-- **PDF**: reportlab (리포트 생성)
+---
 
-## 프로젝트 구조
+## 공통 환경 준비
 
-```
-investment-dashboard/
-├── app.py                 # Streamlit 메인앱 (23탭, 6카테고리)
-├── requirements.txt       # 의존성 목록
-├── src/                   # 분석 엔진 모듈 (22개)
-│   ├── skills_engine.py   # 6-Skills 산출
-│   ├── data_pipeline.py   # 데이터 수집/전처리
-│   ├── visualizations.py  # Plotly 차트
-│   ├── factor_attribution.py  # Fama-French 3-Factor
-│   ├── garch_model.py     # GARCH(1,1) 변동성
-│   ├── black_litterman.py # Black-Litterman 모델
-│   ├── portfolio_dna.py   # 12차원 DNA 핑거프린트
-│   ├── backtest_engine.py # 백테스트 엔진
-│   └── ...                # 외 13개 모듈
-├── skills/                # Skills.md 규칙 정의서 (5개)
-└── .streamlit/config.toml # 테마 설정
+Python 3.8+ 환경을 권장합니다.
+
+```bash
+pip install pandas numpy scikit-learn lightgbm catboost xgboost optuna torch transformers tqdm
 ```
 
-## 데이터 소스
+필요 패키지는 프로젝트별로 다를 수 있으니, 실행 스크립트의 import를 기준으로 추가 설치해 주세요.
 
-- **실시간**: yfinance API (미국 주식/ETF, 키 불필요)
-- **한국 주식**: KRX 80+ 종목 내장 (4개 섹터)
-- **직접 입력**: 종목/비중 수동 입력 또는 CSV 업로드
-- **합성 데이터**: 오프라인 데모용 통계적 시뮬레이션
+## 참고
 
-## 참가자
-
-- 이우창 (Woochang Lee)
-- 2026년 4월
+- 대회 데이터/규정은 각 데이콘 대회 페이지의 약관과 규칙을 따릅니다.
+- 저장소 내 일부 스크립트는 경로를 비워 둔 템플릿 형태이므로 실행 전 경로 설정이 필요합니다.

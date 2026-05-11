@@ -2,6 +2,6 @@ __pycache__/
 *.pyc
 .DS_Store
 *.zip
-docs/
-assets/fonts/*.ttf
-.streamlit/secrets.toml
+investment-dashboard/docs/
+investment-dashboard/assets/fonts/*.ttf
+investment-dashboard/.streamlit/secrets.toml
